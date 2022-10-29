@@ -108,9 +108,10 @@ Node_columna *CrearMatriz()
             New_fila = add_end_fila(New_fila, New_nodo_fila(n));
         }
         Newp->next = New_fila;
-        printf("el prmer valor es %i \n", (Newp->posicion));
-        printf("el prmer valor auxliar es %i \n", (aux->posicion));
+        //
+        // printf("el prmer valor auxliar es %i \n", (aux->posicion));
         Newp = Newp->abajo;
+        New_fila = NULL;
     }
 
     return aux;
@@ -118,17 +119,18 @@ Node_columna *CrearMatriz()
 
 void print_Matriz(Node_columna *matriz)
 {
-    Node_columna *auxColumna1, auxColumna2;
+    Node_columna *auxColumna1;
     Node_Fila *auxFila;
+
     for (int i = 1; i <= sizeColumna; i++)
     {
-        auxColumna1 = matriz;
+
         auxFila = matriz->next;
 
         for (int j = 1; j <= sizeFila; j++)
         {
 
-            printf("%i\n", auxFila->value);
+            printf("%i  ", auxFila->value);
             auxFila = auxFila->next;
         }
         printf("\n");
