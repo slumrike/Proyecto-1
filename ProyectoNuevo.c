@@ -12,7 +12,6 @@ void print_Matriz(Node_columna *matriz);
 
 void main()
 {
-  // prueba();
   matriz = CrearMatriz();
   print_Matriz(matriz);
 }

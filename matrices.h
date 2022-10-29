@@ -40,10 +40,10 @@ Node_columna *New_nodo_columna()
 // crea nuevo nodo en x
 Node_Fila *New_nodo_fila(int num)
 {
-    Pos_x++;
+
     Node_Fila *newp;
-    // if (num = 0)
-    //     return;
+    if (num == 0)
+        return NULL;
     if ((newp = (Node_Fila *)malloc(sizeof(Node_Fila))) == NULL)
     {
         fprintf(stderr, "new_item: error en malloc\n");
@@ -61,6 +61,8 @@ Node_Fila *add_end_fila(Node_Fila *listp, Node_Fila *newp)
     Node_Fila *p;
     if (listp == NULL)
         return newp;
+    if (newp == NULL)
+        return listp;
     for (p = listp; p->next != NULL; p = p->next)
         ;
     p->next = newp;
@@ -104,49 +106,49 @@ Node_columna *CrearMatriz()
         {
             printf("ingresar el num de la posicion (%i,%i) = ", i, j);
             scanf(" %i", &n);
-
-            New_fila = add_end_fila(New_fila, New_nodo_fila(n));
+            Pos_x++;
+            if (n != 0)
+                New_fila = add_end_fila(New_fila, New_nodo_fila(n));
         }
+
         Newp->next = New_fila;
-        //
-        // printf("el prmer valor auxliar es %i \n", (aux->posicion));
         Newp = Newp->abajo;
         New_fila = NULL;
+        Pos_x = 0;
     }
-
     return aux;
+}
+
+int Buscar_Elemento_fila(Node_Fila *Fila, int posicion)
+{
+    while (Fila)
+    {
+        if (Fila->posicion == posicion)
+        {
+            return Fila->value;
+        }
+        Fila = Fila->next;
+    }
+    return 0;
 }
 
 void print_Matriz(Node_columna *matriz)
 {
     Node_columna *auxColumna1;
     Node_Fila *auxFila;
+    int x = 0;
 
-    for (int i = 1; i <= sizeColumna; i++)
+    while (matriz)
     {
-
         auxFila = matriz->next;
-
-        for (int j = 1; j <= sizeFila; j++)
+        matriz = matriz->abajo;
+        for (int i = 1; i <= sizeFila; i++)
         {
-
-            printf("%i  ", auxFila->value);
-            auxFila = auxFila->next;
+            x = Buscar_Elemento_fila(auxFila, i);
+            printf("%i ", x);
         }
         printf("\n");
-        matriz = matriz->abajo;
     }
 }
 
-void prueba()
-{
-
-    Node_columna *newp = NULL;
-
-    for (int i = 1; i < 4; i++)
-    {
-        newp = add_end_columna(newp, New_nodo_columna());
-    }
-    printf("%i\n", newp->posicion);
-    printf("%i", newp->abajo->posicion);
-}
+Node_columna *Suma(Node_columna m1, Node_columna m2);
