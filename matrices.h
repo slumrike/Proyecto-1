@@ -95,11 +95,11 @@ Node_columna *CrearMatriz()
         Newp = add_end_columna(Newp, New_nodo_columna());
     }
     aux = Newp;
+    printf("primera posicion %i\n", Newp->posicion);
 
     for (i = 1; i <= sizeColumna; i++)
     {
 
-        Newp = Newp->abajo;
         for (j = 1; j <= sizeFila; j++)
         {
             printf("ingresar el num de la posicion (%i,%i) = ", i, j);
@@ -107,16 +107,13 @@ Node_columna *CrearMatriz()
 
             New_fila = add_end_fila(New_fila, New_nodo_fila(n));
         }
-
-        printf("%i", Newp->posicion);
-        aux2 = Newp->next;
-        aux2 = New_fila;
-        New_fila = NULL;
-
-        // printf("el prmer valor es %i \n", (New_columna->next->value));
+        Newp->next = New_fila;
+        printf("el prmer valor es %i \n", (Newp->posicion));
+        printf("el prmer valor auxliar es %i \n", (aux->posicion));
+        Newp = Newp->abajo;
     }
 
-    return Newp;
+    return aux;
 }
 
 void print_Matriz(Node_columna *matriz)

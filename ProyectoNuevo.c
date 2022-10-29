@@ -14,6 +14,5 @@ void main()
 {
   // prueba();
   matriz = CrearMatriz();
-  printf("xd=%i", matriz->posicion);
-  //  print_Matriz(matriz);
+  print_Matriz(matriz);
 }
