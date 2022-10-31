@@ -21,8 +21,9 @@ void main()
   // print_Matriz(matriz);
 
   // matrizsumada = Suma(Principal, matriz);
-  printf("holahola\n");
+
   // print_Matriz(matrizsumada);
   Mescalar = ProductoPorEscalar(5, Principal);
+  printf("holahola\n");
   print_Matriz(Mescalar);
 }

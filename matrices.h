@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 
 // DECLARACION DE ESTRUCTURAS
 
@@ -246,8 +247,9 @@ Node_Principal *ProductoPorEscalar(int e, Node_Principal *listp)
     {
         fila = columna->next;
 
-        for (int j = 1; j <= listp->SizeFila; j++)
+        while (fila != NULL)
         {
+
             fila->value = fila->value * e;
             fila = fila->next;
         }
