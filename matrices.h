@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 
+// DECLARACION DE ESTRUCTURAS
+
 typedef struct Node_Fila
 {
     int value;
@@ -16,11 +18,20 @@ typedef struct Node_columna
     struct Node_Fila *next;
 } Node_columna;
 
+typedef struct Node_Principal
+{
+    int SizeColumna;
+    int SizeFila;
+    struct Node_columna *matriz;
+
+} Node_Principal;
+
 /// DECLARACION DE VARIABLES GLOBALES
 
-int sizeFila = 2, sizeColumna = 2;
+int sizeFila, sizeColumna;
 int Pos_y = 0, Pos_x = 0; // sirven de posicion para los nodos
-Node_columna *matriz;
+
+Node_Principal *Principal, *matrizsumada, *matriz, *Mescalar;
 
 // crea nuevo nodo en y
 Node_columna *New_nodo_columna()
@@ -34,16 +45,16 @@ Node_columna *New_nodo_columna()
     }
     newp->posicion = Pos_y;
     newp->next = NULL;
+    newp->abajo = NULL;
     return newp;
 }
 
 // crea nuevo nodo en x
 Node_Fila *New_nodo_fila(int num)
+
 {
 
     Node_Fila *newp;
-    if (num == 0)
-        return NULL;
     if ((newp = (Node_Fila *)malloc(sizeof(Node_Fila))) == NULL)
     {
         fprintf(stderr, "new_item: error en malloc\n");
@@ -56,6 +67,19 @@ Node_Fila *New_nodo_fila(int num)
     return newp;
 }
 
+Node_Principal *New_nodo_Principal(int n, int m)
+{
+    Node_Principal *newp;
+    if ((newp = (Node_Principal *)malloc(sizeof(Node_Principal))) == NULL)
+    {
+        fprintf(stderr, "new_item: error en malloc\n");
+        exit(1);
+    }
+
+    newp->matriz = NULL;
+    newp->SizeColumna = n;
+    newp->SizeFila = m;
+}
 Node_Fila *add_end_fila(Node_Fila *listp, Node_Fila *newp)
 {
     Node_Fila *p;
@@ -80,24 +104,27 @@ Node_columna *add_end_columna(Node_columna *listp, Node_columna *newp)
     return listp;
 }
 
-Node_columna *CrearMatriz()
+Node_Principal *CrearMatriz()
 {
+    Node_Principal *MatrizPrincipal = NULL;
     Node_columna *Newp = NULL, *aux;
-    Node_Fila *New_fila = NULL, *aux2 = NULL;
-    int i, j, n = 0;
+    Node_Fila *New_fila = NULL;
+    int i, j, n;
 
     printf("ingresar las dimenciones del arreglo (0x0)\n");
     printf("Columnas = ");
-    scanf(" %d", &sizeColumna);
+    scanf(" %i", &sizeColumna);
     printf("Filas = ");
-    scanf(" %d", &sizeFila);
+    scanf(" %i", &sizeFila);
+
+    MatrizPrincipal = New_nodo_Principal(sizeColumna, sizeFila);
 
     for (i = 1; i <= sizeColumna; i++)
     {
         Newp = add_end_columna(Newp, New_nodo_columna());
     }
+
     aux = Newp;
-    printf("primera posicion %i\n", Newp->posicion);
 
     for (i = 1; i <= sizeColumna; i++)
     {
@@ -116,7 +143,9 @@ Node_columna *CrearMatriz()
         New_fila = NULL;
         Pos_x = 0;
     }
-    return aux;
+
+    MatrizPrincipal->matriz = aux;
+    return MatrizPrincipal;
 }
 
 int Buscar_Elemento_fila(Node_Fila *Fila, int posicion)
@@ -132,17 +161,24 @@ int Buscar_Elemento_fila(Node_Fila *Fila, int posicion)
     return 0;
 }
 
-void print_Matriz(Node_columna *matriz)
+void print_Matriz(Node_Principal *Principal)
 {
-    Node_columna *auxColumna1;
+    Node_columna *auxColumna1, *matriz;
     Node_Fila *auxFila;
     int x = 0;
+
+    if (Principal == NULL)
+    {
+        printf("no existe la matriz");
+        return;
+    }
+    matriz = Principal->matriz;
 
     while (matriz)
     {
         auxFila = matriz->next;
         matriz = matriz->abajo;
-        for (int i = 1; i <= sizeFila; i++)
+        for (int i = 1; i <= Principal->SizeFila; i++)
         {
             x = Buscar_Elemento_fila(auxFila, i);
             printf("%i ", x);
@@ -151,4 +187,72 @@ void print_Matriz(Node_columna *matriz)
     }
 }
 
-Node_columna *Suma(Node_columna m1, Node_columna m2);
+Node_Principal *Suma(Node_Principal *m1, Node_Principal *m2)
+{
+    Node_columna *columna1, *columna2, *columna3, *aux;
+    Node_Fila *fila1, *fila2, *fila3;
+    Node_Principal *Resultado = NULL;
+    int valor;
+
+    // paso 1 verificar que sean iguales las matrices
+    if ((m1->SizeColumna != m2->SizeColumna) || (m1->SizeFila != m2->SizeFila))
+    {
+        return Resultado;
+    }
+
+    // paso 2 ver las columnas y asignarlas
+    columna1 = m1->matriz;
+    columna2 = m2->matriz;
+
+    Resultado = New_nodo_Principal(m1->SizeColumna, m1->SizeFila);
+    Pos_y = 0;
+    for (int i = 1; i <= m1->SizeColumna; i++)
+    {
+        columna3 = add_end_columna(columna3, New_nodo_columna());
+    }
+
+    aux = columna3;
+
+    for (int i = 1; i <= m1->SizeColumna; i++)
+    {
+        fila1 = columna1->next;
+        fila2 = columna2->next;
+
+        for (int j = 1; j <= m1->SizeFila; j++)
+        {
+
+            valor = (Buscar_Elemento_fila(fila1, j) + Buscar_Elemento_fila(fila2, j));
+            if (valor != 0)
+                fila3 = add_end_fila(fila3, New_nodo_fila(valor));
+        }
+        Pos_x = 0;
+        columna3->next = fila3;
+        columna3 = columna3->abajo;
+    }
+
+    Resultado->matriz = aux;
+    return Resultado;
+}
+
+Node_Principal *ProductoPorEscalar(int e, Node_Principal *listp)
+{
+
+    Node_columna *columna;
+    Node_Fila *fila;
+
+    columna = listp->matriz;
+
+    for (int i = 1; i <= listp->SizeColumna; i++)
+    {
+        fila = columna->next;
+
+        for (int j = 1; j <= listp->SizeFila; j++)
+        {
+            fila->value = fila->value * e;
+            fila = fila->next;
+        }
+        columna = columna->abajo;
+    }
+
+    return listp;
+}
