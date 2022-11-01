@@ -29,7 +29,7 @@ typedef struct Node_Principal
 
 /// DECLARACION DE VARIABLES GLOBALES
 
-int sizeFila, sizeColumna;
+int sizeFila, sizeColumna, elemento;
 // sirven de posicion para los nodos
 
 Node_Principal *Principal, *matrizsumada, *matriz, *Mescalar;
@@ -168,27 +168,30 @@ int Buscar_Elemento_fila(Node_Fila *Fila, int posicion)
 
 void print_Matriz(Node_Principal *Principal)
 {
-    Node_columna *matriz=Principal->matriz;
-    int filas,columnas;
-    filas=Principal->SizeFila;columnas=Principal->SizeColumna;
-    for (int i=1;i<=columnas;i++){
+    Node_columna *matriz = Principal->matriz;
+    int filas, columnas;
+    filas = Principal->SizeFila;
+    columnas = Principal->SizeColumna;
+    for (int i = 1; i <= columnas; i++)
+    {
 
-    if (matriz->posicion==i){
-        for(int j=1;j<=filas;j++){
-            printf("|%i|",Buscar_Elemento_fila(matriz->next,j));
+        if (matriz != NULL && matriz->posicion == i)
+        {
+            for (int j = 1; j <= filas; j++)
+            {
+                printf("|%i|", Buscar_Elemento_fila(matriz->next, j));
+            }
+            matriz = matriz->abajo;
         }
-        matriz=matriz->abajo;
-    }else{
-        for (int j=1;j<=filas;j++){
-            printf("|0|");
+        else
+        {
+            for (int j = 1; j <= filas; j++)
+            {
+                printf("|0|");
+            }
         }
+        printf("\n");
     }
-    printf("\n");
-
-
-    }
-
-    
 }
 
 /*Node_Principal *Suma(Node_Principal *m1, Node_Principal *m2)
@@ -276,25 +279,34 @@ int Obtener_elemento(int Pos_Fila, int Pos_Columna, Node_Principal *listp)
     Node_columna *auxColumna;
 
     auxColumna = listp->matriz;
-    for (int i = 1; i < Pos_Columna; i++, auxColumna = auxColumna->abajo)
-        ;
-
+    while (auxColumna != NULL && auxColumna->posicion != Pos_Columna)
+    {
+        auxColumna = auxColumna->abajo;
+    }
+    if (auxColumna == NULL)
+        return 0;
     return Buscar_Elemento_fila(auxColumna->next, Pos_Fila);
 }
 
 void Asignar_Elemento(int Pos_Fila, int Pos_Columna, int elemento, Node_Principal *listp)
 {
-    Node_columna *auxColumna;
-    Node_Fila *Fila, *aux;
-    int Pos_y = 0, Pos_x = 0;
+    Node_columna *auxColumna, *prev, *newpColumna;
+    Node_Fila *Fila, *aux, *newpFila;
+    int Pos_y = 0;
     Pos_x = Pos_Fila;
     auxColumna = listp->matriz;
-    for (int i = 1; i < Pos_Columna; i++, auxColumna = auxColumna->abajo)
-        ;
-    Fila = auxColumna->next;
-    aux = Fila;
-    if (Fila)
+
+    while (auxColumna != NULL && auxColumna->posicion < Pos_Columna)
     {
+        prev = auxColumna;
+        auxColumna = auxColumna->abajo;
+    }
+
+    if (auxColumna->posicion == Pos_Columna)
+    {
+
+        Fila = auxColumna->next;
+        aux = Fila;
         while (Fila)
         {
 
@@ -309,7 +321,13 @@ void Asignar_Elemento(int Pos_Fila, int Pos_Columna, int elemento, Node_Principa
         aux = add_end_fila(aux, New_nodo_fila(elemento));
         return;
     }
-    auxColumna->next = New_nodo_fila(elemento);
+    newpColumna = New_nodo_columna(Pos_Columna);
+    Pos_x = Pos_Fila;
+    newpFila = New_nodo_fila(elemento);
+    newpColumna->next = newpFila;
+
+    prev->abajo = newpColumna;
+    newpColumna->abajo = auxColumna;
 
     return;
 }

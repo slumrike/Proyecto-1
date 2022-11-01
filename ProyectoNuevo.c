@@ -18,10 +18,10 @@ void Asignar_Elemento(int Pos_Fila, int Pos_Columna, int elemento, Node_Principa
 void main()
 {
   Principal = CrearMatriz();
-  printf("%i\n", Principal->matriz->abajo->next->posicion);
+
   print_Matriz(Principal);
   printf("\n");
 
-  // Asignar_Elemento(2, 2, 9, Principal);
-  // print_Matriz(Principal);
+  elemento = Obtener_elemento(2, 2, Principal);
+  printf("%i\n", elemento);
 }
