@@ -168,62 +168,27 @@ int Buscar_Elemento_fila(Node_Fila *Fila, int posicion)
 
 void print_Matriz(Node_Principal *Principal)
 {
-    Node_columna *auxColumna1, *matriz, *bajar, *auxPosMatriz;
-    Node_Fila *auxFila;
-    int x = 0, num = 0;
-    int Pos_y = 0;
+    Node_columna *matriz=Principal->matriz;
+    int filas,columnas;
+    filas=Principal->SizeFila;columnas=Principal->SizeColumna;
+    for (int i=1;i<=columnas;i++){
 
-    if (Principal == NULL)
-    {
-        printf("no existe la matriz");
-        return;
+    if (matriz->posicion==i){
+        for(int j=1;j<=filas;j++){
+            printf("|%i|",Buscar_Elemento_fila(matriz->next,j));
+        }
+        matriz=matriz->abajo;
+    }else{
+        for (int j=1;j<=filas;j++){
+            printf("|0|");
+        }
     }
-    matriz = Principal->matriz;
+    printf("\n");
 
-    bajar = matriz;
-    auxPosMatriz = matriz;
 
-    Pos_y = 1;
-
-    while (bajar != NULL)
-    {
-
-        auxPosMatriz = bajar;
-        bajar = bajar->abajo;
-        auxFila = auxPosMatriz->next;
-        if (bajar != NULL)
-        {
-            x = bajar->posicion;
-        }
-        else
-            x = Principal->SizeColumna;
-
-        if (auxPosMatriz->posicion == Pos_y)
-        {
-            for (int i = 1; i <= Principal->SizeFila; i++)
-            {
-                num = Buscar_Elemento_fila(auxFila, i);
-                printf("%i ", num);
-            }
-
-            printf("\n");
-        }
-
-        if (auxPosMatriz->posicion != Pos_y)
-        {
-
-            for (int i = 1; i <= (x - auxPosMatriz->posicion - 1); i++)
-            {
-
-                for (int j = 1; j <= Principal->SizeFila; j++)
-                {
-                    printf("0 ");
-                }
-            }
-            Pos_y = auxPosMatriz->posicion;
-        }
-        Pos_y++;
     }
+
+    
 }
 
 /*Node_Principal *Suma(Node_Principal *m1, Node_Principal *m2)
