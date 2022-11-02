@@ -18,10 +18,52 @@ void Asignar_Elemento(int Pos_Fila, int Pos_Columna, int elemento, Node_Principa
 // Node_Principal *Producto(Node_Principal *m1, Node_Principal *m2);
 Node_Principal *transponer(Node_Principal *Principal);
 
+Node_Principal *matriz3;
+int operacion, x, y, e;
+
 void main()
 {
   Principal = CrearMatriz();
-  matriz2 = CrearMatriz();
 
-  print_Matriz(Producto(Principal, matriz2));
+  printf("Que operacion desea realizar?\n1.Obtener elemento\n2.Asignar elemento\n3.Sumar matrices\n4.Producto por escalar\n5.Producto de Matrices\n6.Imprimir la matriz\n");
+  scanf("%i", &operacion);
+  switch (operacion)
+  {
+  case 1:
+    printf("Ubicacion en X:");
+    scanf("%i", &x);
+    printf("Ubicacion en Y:");
+    scanf("%i", &y);
+    printf("EL elemento es: %i", Obtener_elemento(y, x, Principal));
+    break;
+  case 2:
+    printf("Ubicacion en X:");
+    scanf("%i", &x);
+    printf("Ubicacion en Y:");
+    scanf("%i", &y);
+    printf("elemento a asignar:");
+    scanf("%i", &e);
+    Asignar_Elemento(y, x, e, Principal);
+    print_Matriz(Principal);
+    break;
+  case 3:
+    matriz2 = CrearMatriz();
+    matriz3 = Suma(Principal, matriz2);
+    print_Matriz(matriz3);
+    break;
+  case 4:
+    printf("escalar a multiplicar:");
+    scanf("%i", &e);
+    matriz3=ProductoPorEscalar(e,Principal);
+    print_Matriz(matriz3);
+    break;
+  case 5:
+    matriz2=CrearMatriz();
+    matriz3=Producto(Principal,matriz2);
+    print_Matriz(matriz3);
+    break;
+  case 6:
+    print_Matriz(Principal);
+    break;
+  }
 }
