@@ -67,7 +67,7 @@ Node_Fila *New_nodo_fila(int num)
 }
 
 // crea un nuevo nodo principal que apunta a la matriz y contiene las dimenciones de esta
-Node_Principal *New_nodo_Principal(int n, int m)
+Node_Principal *New_nodo_Principal(int n, int m) si
 {
     Node_Principal *newp;
     if ((newp = (Node_Principal *)malloc(sizeof(Node_Principal))) == NULL)
@@ -215,6 +215,7 @@ void print_Matriz(Node_Principal *Principal)
         printf("\n");
     }
 }
+
 // Funcion encargada de recibir dos matrices y sumarlas generando la matriz resultado
 Node_Principal *Suma(Node_Principal *m1, Node_Principal *m2)
 {
@@ -311,134 +312,154 @@ Node_Principal *Suma(Node_Principal *m1, Node_Principal *m2)
     return Resultado;
 }
 
+// Producto escalar multiplica toda una matriz por el mismo numero
 Node_Principal *ProductoPorEscalar(int e, Node_Principal *listp)
-
 {
+    Node_columna *columna; // esta sera la columna de la matriz(vertical)
+    Node_Fila *fila;       // esta sera la fila de la matriz(fila)
 
-    Node_columna *columna;
-    Node_Fila *fila;
+    columna = listp->matriz; // Asignamos la columna de nuestro nodo principal a la variable columna
 
-    columna = listp->matriz;
-
-    while (columna)
+    while (columna) // mientras columna sea distinto de NULL
     {
-        fila = columna->next;
+        fila = columna->next; // nos posicionamos en la fila de la columna actual
 
-        while (fila != NULL)
+        while (fila != NULL) // sirve para repetir los cambios de valores
         {
 
-            fila->value = fila->value * e;
-            fila = fila->next;
+            fila->value = fila->value * e; // Modificamos el valor contenido en fila por fila por el elemto
+            fila = fila->next;             // despues de modificar nos movemos al siguiente nodo
         }
-        columna = columna->abajo;
+        columna = columna->abajo; // nos movemos en columnas para seguir modificando hasta terminar la matriz
     }
 
     return listp;
 }
 
+// Funcion que devuelve el valor de un elemento en cualquier parte de la matriz
 int Obtener_elemento(int Pos_Fila, int Pos_Columna, Node_Principal *listp)
 {
-    Node_columna *auxColumna;
+    Node_columna *auxColumna; // declaramos la columna donde buscaremos
 
-    auxColumna = listp->matriz;
+    auxColumna = listp->matriz; // asignamos la columna de la lista principal
+
+    // preguntamos si la columna es NUll y despues si su posicion es difertene a la de columna
+    //  por lo que mientras no la consiga o sea NUll el resultado estara dentro del ciclo
     while (auxColumna != NULL && auxColumna->posicion != Pos_Columna)
     {
-        auxColumna = auxColumna->abajo;
+        auxColumna = auxColumna->abajo; // movimiento para recorrer toda la columna
     }
-    if (auxColumna == NULL)
-        return 0;
+    if (auxColumna == NULL) // de no conseguirla terminara en NULL
+        return 0;           // devolvera 0 indicando que no existe la columna
+
+    // de existir la columna ahora busca en la fila de esa columna y retorna el valor encontrado
     return Buscar_Elemento_fila(auxColumna->next, Pos_Fila);
 }
 
+// Funcion que asigna a una posicion determinada un elemento determinado
 void Asignar_Elemento(int Pos_Fila, int Pos_Columna, int elemento, Node_Principal *listp)
 {
+    // declaracion de variables
     Node_columna *auxColumna, *prev, *newpColumna;
     Node_Fila *Fila, *aux, *newpFila;
     int Pos_y = 0;
+    // se define la pos horizontal como la posicion de la fila a buscar
     Pos_x = Pos_Fila;
-    auxColumna = listp->matriz;
-    prev = auxColumna;
-    if (auxColumna == NULL)
+    prev = auxColumna;          // el nodo anterior a auxColumna sera dado por prev
+    auxColumna = listp->matriz; // define la columna donde se trabajara
+
+    if (auxColumna == NULL) // de ser la columna null significa que es una matriz vacia
     {
-        printf("si pase");
-        auxColumna = New_nodo_columna(Pos_Columna);
-        Pos_x = Pos_Fila;
-        newpFila = New_nodo_fila(elemento);
-        listp->matriz = auxColumna;
-        auxColumna->next = newpFila;
+        auxColumna = New_nodo_columna(Pos_Columna); // creamos el nodo columna con la posicion pedida
+        newpFila = New_nodo_fila(elemento);         // creamos una fila con el elemento pedido
+        listp->matriz = auxColumna;                 // enlazamos la columna con la lista principal
+        auxColumna->next = newpFila;                // enlazamos la columna con su respectiva fila
         return;
     }
 
+    // Primero se pregunta si la columna de abajo de donde estamos es nula, puesto que protege que nuestras operaciones
+    // Despues se pregunta si la posicion es menor que la posicion que buscamos
     while (auxColumna->abajo != NULL && auxColumna->posicion < Pos_Columna)
     {
         prev = auxColumna;
         auxColumna = auxColumna->abajo;
-    }
-
+    } // nos movemos por las columnas hasta estar en el ultimo elemento o estar justo antes o encima de donde deberia estar la columna buscada
+    // Verifica si auxColumna es igual a la posicion que buscamos
     if (auxColumna->posicion == Pos_Columna)
     {
 
-        Fila = auxColumna->next;
+        Fila = auxColumna->next; // fila de la columna
         aux = Fila;
-        while (Fila)
+        while (Fila) // mientras fila exista
         {
 
-            if (Fila->posicion == Pos_Fila)
+            if (Fila->posicion == Pos_Fila) // si la posicion de la fila corresponde con la que buscamos significa que existe y la encontramos
             {
-                Fila->value = elemento;
+                Fila->value = elemento; // le cambiamos el elemento y retornamos
                 return;
             }
-            Fila = Fila->next;
+            Fila = Fila->next; // vamos moviendonos en las filas
         }
-
-        aux = add_end_fila(aux, New_nodo_fila(elemento));
+        // de no existir el elemento tenemos que crearlo
+        aux = add_end_fila(aux, New_nodo_fila(elemento)); // se adiciona el elemento al final de la fila con su posicion correspondiente
         return;
     }
 
-    newpColumna = New_nodo_columna(Pos_Columna);
+    newpColumna = New_nodo_columna(Pos_Columna); // creamos una nueva columna con la posicion indicada
     Pos_x = Pos_Fila;
-    newpFila = New_nodo_fila(elemento);
-    newpColumna->next = newpFila;
-    if (prev == auxColumna)
+    newpFila = New_nodo_fila(elemento); // creamos una nueva fila
+    newpColumna->next = newpFila;       // asignamos la nueva fila a nuestra columna
+    if (prev == auxColumna)             // si el anterior es igual a columna significa que el siguiente es NULL,
+    // por tanto solo hay que asignarle a el prev la direccion del nuevo nodo de la columna
     {
         prev->abajo = newpColumna;
         return;
     }
+    // en caso contrario asignamos al siguiente de prev a el nuevo nodo de columna,
+    //  y a el posterios de el nuevo nodo le asignamos el auxColumna (asi queda ordenado en columnas)
     prev->abajo = newpColumna;
     newpColumna->abajo = auxColumna;
 
     return;
 }
 
-Node_Principal *trans(Node_Principal *Principal)
+// Funcion que transpone una matriz
+Node_Principal *transponer(Node_Principal *Principal)
 {
+    // Declaracion de variables
     Node_Principal *NewMatriz;
     Node_columna *Base, *aux;
-    NewMatriz = New_nodo_Principal(Principal->SizeFila, Principal->SizeColumna);
     Node_Fila *newFila;
-    int e;
-    newFila = NULL;
-    Base = NewMatriz->matriz;
 
-    for (int i = 1; i <= Principal->SizeFila; i++)
+    NewMatriz = New_nodo_Principal(Principal->SizeFila, Principal->SizeColumna);
+    // creacion de Nodo Principal con las filas y columnas correspondientes a la transpuesta
+
+    int e;                    // variable que guarda el valor que contiene una posicion espesifica
+    newFila = NULL;           // Inicializamos la nueva fila
+    Base = NewMatriz->matriz; // Bases sera nuestra columna del resultado
+
+    for (int i = 1; i <= Principal->SizeFila; i++) // para las filas
     {
 
-        for (int j = 1; j <= Principal->SizeColumna; j++)
+        for (int j = 1; j <= Principal->SizeColumna; j++) // para las columnas
         {
-            Pos_x = j;
+            Pos_x = j; // determinamos la posicion para que sea igual a j
             e = Obtener_elemento(i, j, Principal);
-            if (e)
-                newFila = add_end_fila(newFila, New_nodo_fila(e));
+            if (e)                                                 // si e es diferente de 0 lo adiciono a la fila
+                newFila = add_end_fila(newFila, New_nodo_fila(e)); // se va creando una fila de los elementos que estan en las columnas
         }
-        if (newFila != NULL)
+
+        if (newFila != NULL) // Fila existe
         {
-            Base = add_end_columna(Base, New_nodo_columna(i));
-            NewMatriz->matriz = Base;
-            aux = Base;
+            Base = add_end_columna(Base, New_nodo_columna(i)); // le creamos un nodo de columna al final a al columna principal
+            NewMatriz->matriz = Base;                          // se le asigna al nodo principal la columna
+            aux = Base;                                        // creamos un auxiliar para movernos
             while (aux->abajo)
-                aux = aux->abajo;
-            aux->next = newFila;
+                aux = aux->abajo; // nos vamos al ultim elemento de la columna
+
+            aux->next = newFila; // le asignamos la fila a la columna creada
         }
+        // reiniciamos newFila
         newFila = NULL;
     }
 
@@ -448,41 +469,22 @@ Node_Principal *trans(Node_Principal *Principal)
 /*Node_Principal *Producto(Node_Principal *m1, Node_Principal *m2)
 {
 
-     Node_Principal *matriz_Resultado_principal;
-     Node_columna *columnaResultado, auxcolumna;
-     int valor1, valor2, auxfila, auxcolumna;
+    Node_Principal *matriz_Resultado_principal;
+    Node_columna *columnaResultado, auxcolumna;
+    int valor1, valor2, auxfila, auxcolumna;
 
-     if (m1->SizeFila != m2->SizeColumna)
-         ;
-     return;
+    if (m1->SizeFila != m2->SizeColumna)
+        ;
+    return;
 
-     matriz_Resultado_principal = New_nodo_Principal(m1->SizeColumna, m2->SizeFila);
+    matriz_Resultado_principal = New_nodo_Principal(m1->SizeColumna, m2->SizeFila);
 
-     for (int i = 1; i <= sizeColumna; i++)
-     {
-         columnaResultado = add_end_columna(columnaResultado, New_nodo_columna());
-     }
-
-     for (int i = 1; i <= m1->SizeFila; i++)
-     {
-         }
- */
-
-/*Node_Principal *Trans(Node_Principal *Principal)
-{
-    Node_Principal *newp;
-    newp = New_nodo_Principal(Principal->SizeFila, Principal->SizeColumna);
-    Node_columna *matriz = Principal->matriz;
-
-    for (int i = 1; i < Principal->SizeColumna; i++)
+    for (int i = 1; i <= sizeColumna; i++)
     {
-        if (matriz->posicion = i)
-        {
-            int elemento = Buscar_elemento_fila(matriz->next, j);
-            if (elemento)
-            {
-                Asignar_Elemento(j, i, elemento, newp);
-            }
-        }
+        columnaResultado = add_end_columna(columnaResultado, New_nodo_columna());
+    }
+
+    for (int i = 1; i <= m1->SizeFila; i++)
+    {
     }
 }*/
