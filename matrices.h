@@ -67,7 +67,7 @@ Node_Fila *New_nodo_fila(int num)
 }
 
 // crea un nuevo nodo principal que apunta a la matriz y contiene las dimenciones de esta
-Node_Principal *New_nodo_Principal(int n, int m) si
+Node_Principal *New_nodo_Principal(int n, int m)
 {
     Node_Principal *newp;
     if ((newp = (Node_Principal *)malloc(sizeof(Node_Principal))) == NULL)
@@ -466,25 +466,54 @@ Node_Principal *transponer(Node_Principal *Principal)
     return NewMatriz;
 }
 
-/*Node_Principal *Producto(Node_Principal *m1, Node_Principal *m2)
+// Funcion que resuelve el producto de las matrices
+Node_Principal *Producto(Node_Principal *m1, Node_Principal *m2)
 {
+    // declaracion de variables a usar
+    Node_Principal *matriz_Resultado_principal, *trans;
+    Node_columna *columnaResultado, *auxcolumna, *columna;
+    Node_Fila *auxfila;
+    int valores;
 
-    Node_Principal *matriz_Resultado_principal;
-    Node_columna *columnaResultado, auxcolumna;
-    int valor1, valor2, auxfila, auxcolumna;
-
-    if (m1->SizeFila != m2->SizeColumna)
-        ;
-    return;
-
+    // primero creamos la matriz del resultado que tendra las columnas de la priera matriz y las filas de la segunda matroiz
     matriz_Resultado_principal = New_nodo_Principal(m1->SizeColumna, m2->SizeFila);
+    // verificamos que se puedan operar
+    if (m1->SizeFila != m2->SizeColumna)
+        return matriz_Resultado_principal;
 
-    for (int i = 1; i <= sizeColumna; i++)
-    {
-        columnaResultado = add_end_columna(columnaResultado, New_nodo_columna());
-    }
+    // la columna donde estaran los resultados de la multplicacion
+    columnaResultado = matriz_Resultado_principal->matriz;
 
-    for (int i = 1; i <= m1->SizeFila; i++)
+    trans = transponer(m2); // la transpuesta de la segunda matriz
+
+    for (int i = 1; i <= matriz_Resultado_principal->SizeColumna; i++) // se usa para recorrer todas las columnas de la nueva matriz
     {
+        auxfila = NULL;
+        valores = 0;
+
+        for (int j = 1; j <= matriz_Resultado_principal->SizeFila; j++) // se usa para recorrer todas las filas de la nueva matriz
+        {
+            Pos_x = j;
+            for (int z = 1; z <= m1->SizeFila; z++) // calcula los valores que corresponden a una fila
+            {
+                valores += Obtener_elemento(z, i, m1) * Obtener_elemento(z, j, trans); // calcula los valores de la suma de la mulltiplicacion de las cordenadas
+            }
+            if (valores) // si existe un valor este se le pondra a la suma con su respectiva localizacion
+            {
+                auxfila = add_end_fila(auxfila, New_nodo_fila(valores));
+            }
+            valores = 0;
+        }
+
+        if (auxfila) // si existe la fila se la ponemos a la columna correspondiente de columnaResultado
+        {
+            columna = New_nodo_columna(i);
+            columna->next = auxfila;
+
+            columnaResultado = add_end_columna(columnaResultado, columna);
+            matriz_Resultado_principal->matriz = columnaResultado;
+        }
+        // de no existir la fila nisiquiera se crea una columna
     }
-}*/
+    return matriz_Resultado_principal;
+}

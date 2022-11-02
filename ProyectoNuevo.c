@@ -21,7 +21,7 @@ Node_Principal *transponer(Node_Principal *Principal);
 void main()
 {
   Principal = CrearMatriz();
-  // matriz2 = CrearMatriz();
+  matriz2 = CrearMatriz();
 
-  print_Matriz(transponer(Principal));
+  print_Matriz(Producto(Principal, matriz2));
 }
