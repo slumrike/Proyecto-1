@@ -12,14 +12,14 @@ int Buscar_Elemento_fila(Node_Fila *Fila, int posicion);
 void print_Matriz(Node_Principal *matriz);
 Node_Principal *Suma(Node_Principal *m1, Node_Principal *m2);
 Node_Principal *ProductoPorEscalar(int e, Node_Principal *listp);
+int Obtener_elemento(int Pos_Fila, int Pos_Columna, Node_Principal *listp);
 void Asignar_Elemento(int Pos_Fila, int Pos_Columna, int elemento, Node_Principal *listp);
 // Node_Principal *Producto(Node_Principal *m1, Node_Principal *m2);
-
+Node_Principal *trans(Node_Principal *Principal);
 void main()
 {
   Principal = CrearMatriz();
   // matriz2 = CrearMatriz();
 
-  Asignar_Elemento(4, 4, 9, Principal);
-  print_Matriz(Principal);
+  print_Matriz(trans(Principal));
 }

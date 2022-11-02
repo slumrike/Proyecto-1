@@ -146,6 +146,7 @@ Node_Principal *CrearMatriz()
         {
             printf("ingresar el num de la posicion (%i,%i) = ", i, j);
             scanf(" %i", &n);
+
             Pos_x++;
             if (n != 0)
                 New_fila = add_end_fila(New_fila, New_nodo_fila(n));
@@ -214,42 +215,48 @@ void print_Matriz(Node_Principal *Principal)
         printf("\n");
     }
 }
-
+// Funcion encargada de recibir dos matrices y sumarlas generando la matriz resultado
 Node_Principal *Suma(Node_Principal *m1, Node_Principal *m2)
 {
+    // Declaracion de variables a utilizar y sus auxiliares para movimiento
     Node_columna *columna1, *columna2, *columna3 = NULL, *aux;
     Node_Fila *fila1, *fila2, *fila3 = NULL;
     Node_Principal *Resultado = NULL;
     int valor, columnas, filas;
 
-    // paso 1 verificar que sean iguales las matrices
+    // verificacion de que sean iguales las matrices
     if ((m1->SizeColumna != m2->SizeColumna) || (m1->SizeFila != m2->SizeFila))
     {
-        return Resultado;
+        return Resultado; // de ser diferentes se sale puesto que no se pueden sumar matrices desiguales
     }
 
-    // paso 2 ver las columnas y asignarlas
+    // asignamos las columnas por las que nos moveremos en cada matriz para hacer el recorrido
     columna1 = m1->matriz;
     columna2 = m2->matriz;
 
+    // Variables que indican la longitud en fila y columnas de la matriz total
     filas = m1->SizeFila;
     columnas = m1->SizeColumna;
 
+    // esta sera el Nodo principal donde se guardara la matriz resultado
     Resultado = New_nodo_Principal(m1->SizeColumna, m1->SizeFila);
 
-    for (int i = 1; i <= columnas; i++)
+    for (int i = 1; i <= columnas; i++) // recorremos todas las posibles columnas que puede tener la matriz
     {
-
-        if ((columna1->posicion == i) && (columna2->posicion == i))
+        // el primer paso es verificar si las columnas existen en donde estan ubicadas para despues comparar posiciones
+        // si la posicon de la columna 1 es igual a la columna 2 significa que ambas existen
+        if ((columna1 != NULL && columna1->posicion == i) && (columna2 != NULL && columna2->posicion == i))
         {
+            // creamos filas correspondientes a cada columna
             fila1 = columna1->next;
             fila2 = columna2->next;
             for (int j = 1; j <= filas; j++)
             {
-
+                // se buscan los elementos por posicion por fila de ambas columnas y se suman
                 valor = (Buscar_Elemento_fila(fila1, j) + Buscar_Elemento_fila(fila2, j));
 
                 Pos_x++;
+                // si el valor es 0 no se crea ningun nodo;
                 if (valor != 0)
                     fila3 = add_end_fila(fila3, New_nodo_fila(valor));
             }
@@ -392,11 +399,50 @@ void Asignar_Elemento(int Pos_Fila, int Pos_Columna, int elemento, Node_Principa
     Pos_x = Pos_Fila;
     newpFila = New_nodo_fila(elemento);
     newpColumna->next = newpFila;
-
+    if (prev == auxColumna)
+    {
+        prev->abajo = newpColumna;
+        return;
+    }
     prev->abajo = newpColumna;
     newpColumna->abajo = auxColumna;
 
     return;
+}
+
+Node_Principal *trans(Node_Principal *Principal)
+{
+    Node_Principal *NewMatriz;
+    Node_columna *Base, *aux;
+    NewMatriz = New_nodo_Principal(Principal->SizeFila, Principal->SizeColumna);
+    Node_Fila *newFila;
+    int e;
+    newFila = NULL;
+    Base = NewMatriz->matriz;
+
+    for (int i = 1; i <= Principal->SizeFila; i++)
+    {
+
+        for (int j = 1; j <= Principal->SizeColumna; j++)
+        {
+            Pos_x = j;
+            e = Obtener_elemento(i, j, Principal);
+            if (e)
+                newFila = add_end_fila(newFila, New_nodo_fila(e));
+        }
+        if (newFila != NULL)
+        {
+            Base = add_end_columna(Base, New_nodo_columna(i));
+            NewMatriz->matriz = Base;
+            aux = Base;
+            while (aux->abajo)
+                aux = aux->abajo;
+            aux->next = newFila;
+        }
+        newFila = NULL;
+    }
+
+    return NewMatriz;
 }
 
 /*Node_Principal *Producto(Node_Principal *m1, Node_Principal *m2)
@@ -420,4 +466,23 @@ void Asignar_Elemento(int Pos_Fila, int Pos_Columna, int elemento, Node_Principa
      for (int i = 1; i <= m1->SizeFila; i++)
      {
          }
- }*/
+ */
+
+/*Node_Principal *Trans(Node_Principal *Principal)
+{
+    Node_Principal *newp;
+    newp = New_nodo_Principal(Principal->SizeFila, Principal->SizeColumna);
+    Node_columna *matriz = Principal->matriz;
+
+    for (int i = 1; i < Principal->SizeColumna; i++)
+    {
+        if (matriz->posicion = i)
+        {
+            int elemento = Buscar_elemento_fila(matriz->next, j);
+            if (elemento)
+            {
+                Asignar_Elemento(j, i, elemento, newp);
+            }
+        }
+    }
+}*/
