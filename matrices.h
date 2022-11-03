@@ -360,7 +360,7 @@ int Obtener_elemento(int Pos_Fila, int Pos_Columna, Node_Principal *listp)
 void Asignar_Elemento(int Pos_Fila, int Pos_Columna, int elemento, Node_Principal *listp)
 {
     // declaracion de variables
-    Node_columna *auxColumna, *prev, *newpColumna;
+    Node_columna *auxColumna, *prev, *newpColumna, *liberar;
     Node_Fila *Fila, *aux, *newpFila;
     int Pos_y = 0;
     // se define la pos horizontal como la posicion de la fila a buscar
@@ -368,59 +368,125 @@ void Asignar_Elemento(int Pos_Fila, int Pos_Columna, int elemento, Node_Principa
     prev = auxColumna;          // el nodo anterior a auxColumna sera dado por prev
     auxColumna = listp->matriz; // define la columna donde se trabajara
 
-    if (auxColumna == NULL) // de ser la columna null significa que es una matriz vacia
+    if (elemento != 0)
     {
-        auxColumna = New_nodo_columna(Pos_Columna); // creamos el nodo columna con la posicion pedida
-        newpFila = New_nodo_fila(elemento);         // creamos una fila con el elemento pedido
-        listp->matriz = auxColumna;                 // enlazamos la columna con la lista principal
-        auxColumna->next = newpFila;                // enlazamos la columna con su respectiva fila
-        return;
-    }
+        if (auxColumna == NULL) // de ser la columna null significa que es una matriz vacia
+        {
+            auxColumna = New_nodo_columna(Pos_Columna); // creamos el nodo columna con la posicion pedida
+            newpFila = New_nodo_fila(elemento);         // creamos una fila con el elemento pedido
+            listp->matriz = auxColumna;                 // enlazamos la columna con la lista principal
+            auxColumna->next = newpFila;                // enlazamos la columna con su respectiva fila
+            return;
+        }
 
-    // Primero se pregunta si la columna de abajo de donde estamos es nula, puesto que protege que nuestras operaciones
-    // Despues se pregunta si la posicion es menor que la posicion que buscamos
-    while (auxColumna->abajo != NULL && auxColumna->posicion < Pos_Columna)
-    {
-        prev = auxColumna;
-        auxColumna = auxColumna->abajo;
-    } // nos movemos por las columnas hasta estar en el ultimo elemento o estar justo antes o encima de donde deberia estar la columna buscada
-    // Verifica si auxColumna es igual a la posicion que buscamos
-    if (auxColumna->posicion == Pos_Columna)
-    {
-
-        Fila = auxColumna->next; // fila de la columna
-        aux = Fila;
-        while (Fila) // mientras fila exista
+        // Primero se pregunta si la columna de abajo de donde estamos es nula, puesto que protege que nuestras operaciones
+        // Despues se pregunta si la posicion es menor que la posicion que buscamos
+        while (auxColumna->abajo != NULL && auxColumna->posicion < Pos_Columna)
+        {
+            prev = auxColumna;
+            auxColumna = auxColumna->abajo;
+        } // nos movemos por las columnas hasta estar en el ultimo elemento o estar justo antes o encima de donde deberia estar la columna buscada
+        // Verifica si auxColumna es igual a la posicion que buscamos
+        if (auxColumna->posicion == Pos_Columna)
         {
 
-            if (Fila->posicion == Pos_Fila) // si la posicion de la fila corresponde con la que buscamos significa que existe y la encontramos
+            Fila = auxColumna->next; // fila de la columna
+            aux = Fila;
+            while (Fila) // mientras fila exista
             {
-                Fila->value = elemento; // le cambiamos el elemento y retornamos
-                return;
+
+                if (Fila->posicion == Pos_Fila) // si la posicion de la fila corresponde con la que buscamos significa que existe y la encontramos
+                {
+                    Fila->value = elemento; // le cambiamos el elemento y retornamos
+                    return;
+                }
+                Fila = Fila->next; // vamos moviendonos en las filas
             }
-            Fila = Fila->next; // vamos moviendonos en las filas
+            // de no existir el elemento tenemos que crearlo
+            aux = add_end_fila(aux, New_nodo_fila(elemento)); // se adiciona el elemento al final de la fila con su posicion correspondiente
+            return;
         }
-        // de no existir el elemento tenemos que crearlo
-        aux = add_end_fila(aux, New_nodo_fila(elemento)); // se adiciona el elemento al final de la fila con su posicion correspondiente
-        return;
-    }
 
-    newpColumna = New_nodo_columna(Pos_Columna); // creamos una nueva columna con la posicion indicada
-    Pos_x = Pos_Fila;
-    newpFila = New_nodo_fila(elemento); // creamos una nueva fila
-    newpColumna->next = newpFila;       // asignamos la nueva fila a nuestra columna
-    if (prev == auxColumna)             // si el anterior es igual a columna significa que el siguiente es NULL,
-    // por tanto solo hay que asignarle a el prev la direccion del nuevo nodo de la columna
-    {
+        newpColumna = New_nodo_columna(Pos_Columna); // creamos una nueva columna con la posicion indicada
+        Pos_x = Pos_Fila;
+        newpFila = New_nodo_fila(elemento); // creamos una nueva fila
+        newpColumna->next = newpFila;       // asignamos la nueva fila a nuestra columna
+        if (prev == auxColumna)             // si el anterior es igual a columna significa que el siguiente es NULL,
+        // por tanto solo hay que asignarle a el prev la direccion del nuevo nodo de la columna
+        {
+            prev->abajo = newpColumna;
+            return;
+        }
+        // en caso contrario asignamos al siguiente de prev a el nuevo nodo de columna,
+        //  y a el posterios de el nuevo nodo le asignamos el auxColumna (asi queda ordenado en columnas)
         prev->abajo = newpColumna;
+        newpColumna->abajo = auxColumna;
+
         return;
     }
-    // en caso contrario asignamos al siguiente de prev a el nuevo nodo de columna,
-    //  y a el posterios de el nuevo nodo le asignamos el auxColumna (asi queda ordenado en columnas)
-    prev->abajo = newpColumna;
-    newpColumna->abajo = auxColumna;
+    // si el elemento es 0 utilizamos otro tipo de condiciones para poder garantizar liberar los nodos
+    if (Buscar_columna(auxColumna, Pos_Columna) != 0) // verifica si existe la columna a buscar
+    {
+        prev = NULL;
+        while (auxColumna) // mientras la columna sea diferente de NULL
+        {
 
-    return;
+            if (auxColumna->posicion == Pos_Columna) // verifica si donde estamos ubicados se encuentra la posicion deseada
+            {
+
+                if ((prev == NULL) && (auxColumna->next->next == NULL)) // esta condicion verifica si es la primera columna y la matriz solo tiene 1 elemento
+                {
+                    auxColumna = listp->matriz;
+                    listp->matriz = listp->matriz->abajo; // asignamos al nodo principal la segunda columna
+                    free(auxColumna->next);
+                    free(auxColumna);
+                    return; // free a la columna y la fila
+                }
+
+                if ((auxColumna->next->next == NULL)) // si solo hay un nodo de fila en la columna
+                {
+                    Fila = auxColumna->next;         // auxiliar que servira para hacerle free
+                    liberar = auxColumna;            // guardamos el nodo columna actual para poder hacerle free
+                    prev->abajo = auxColumna->abajo; // enlazamos el nodo anterior con el nodo actual
+                    free(liberar);                   // liberacion de nodos
+                    free(Fila);                      // liberacion de nodos
+
+                    return;
+                }
+
+                Fila = auxColumna->next;                  // ahora asignamos la fila donde buscaremos el elemento
+                if (Buscar_Elemento_fila(Fila, Pos_Fila)) // si la posicion a cambiar no se encuentra no entramos nisiquiera
+                {
+                    newpFila = NULL;
+                    while (Fila)
+                    {
+                        // condicion que verifica si la primera fila encontrada es la necesitada
+                        if (Fila->posicion == Pos_Fila && newpFila == NULL)
+                        {
+                            auxColumna->next = Fila->next; // se asigna como el primero de la fila el siguiente a fila
+                            free(Fila);                    // liberamos el nodo deseado
+                            return;
+                        }
+
+                        if (Fila->posicion == Pos_Fila)
+                        {
+
+                            newpFila->next = Fila->next;
+                            free(Fila);
+                            return;
+                        }
+
+                        newpFila = Fila;
+                        Fila = Fila->next;
+                    }
+                }
+            }
+            prev = auxColumna;
+            auxColumna = auxColumna->abajo; // al no ser verdadero nos movemos hacia el siguiente nodo
+        }
+
+        return;
+    }
 }
 
 // Funcion que transpone una matriz
@@ -464,6 +530,28 @@ Node_Principal *transponer(Node_Principal *Principal)
     }
 
     return NewMatriz;
+}
+
+// Funcion para eliminar matrices evitando basura
+void FreeMatriz(Node_Principal *listp)
+{
+    Node_columna *columna, *auxcolumna;
+    Node_Fila *auxfila, *fila;
+
+    columna = listp->matriz;
+    for (; columna != NULL; columna = auxcolumna)
+    {
+        fila = columna->next;
+        for (; fila != NULL; fila = auxfila)
+        {
+            auxfila = fila->next;
+            free(fila);
+        }
+        auxcolumna = columna->abajo;
+        free(columna);
+    }
+    free(listp);
+    return;
 }
 
 // Funcion que resuelve el producto de las matrices
@@ -515,5 +603,6 @@ Node_Principal *Producto(Node_Principal *m1, Node_Principal *m2)
         }
         // de no existir la fila nisiquiera se crea una columna
     }
+    FreeMatriz(trans);
     return matriz_Resultado_principal;
 }
